@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "LostLink server",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"--prefix",
+				"lostlink-simple",
+				"start"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

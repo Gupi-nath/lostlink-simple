@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Dashboard · LostLink</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .dash-hero {
+      background: linear-gradient(135deg, #07091a 0%, #0d1230 50%, #160d2e 100%);
+      padding: 36px 0 32px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 32px;
+    }
+    .dash-hero h1 { color: #fff; font-size: 1.9rem; }
+    .dash-hero p  { color: var(--text-sub); margin-top: 4px; }
+    .dash-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .section-label {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar" id="navbar"></header>
+
+  <div class="dash-hero">
+    <div class="container">
+      <h1 id="hello">🏠 My Dashboard</h1>
+      <p>Your reports and claims in one place.</p>
+      <div class="dash-actions">
+        <a class="btn btn-accent" href="post.html?type=lost">🔍 Report lost item</a>
+        <a class="btn btn-ghost" href="post.html?type=found">📦 Report found item</a>
+      </div>
+    </div>
+  </div>
+
+  <main style="padding-top:0">
+    <div class="container">
+      <div id="msg" class="alert hidden"></div>
+
+      <div class="stat-grid" style="margin-bottom:32px">
+        <div class="stat-box"><b id="c-posts">—</b><span>My Posts</span></div>
+        <div class="stat-box"><b id="c-open">—</b><span>Still Open</span></div>
+        <div class="stat-box"><b id="c-returned">—</b><span>Returned</span></div>
+        <div class="stat-box"><b id="c-claims">—</b><span>My Claims</span></div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="section-label">📋 My Posts</div>
+          <div class="card"><ul class="list" id="my-items"></ul></div>
+        </div>
+        <div>
+          <div class="section-label">🙋 My Claims</div>
+          <div class="card"><ul class="list" id="my-claims"></ul></div>
+        </div>
+      </div>
+
+      <div class="mt" style="margin-top:36px">
+        <div class="section-label">👤 My Profile</div>
+        <form id="profile-form" class="card card-pad" style="max-width:480px">
+          <div class="field"><label for="p-name">Full name</label><input id="p-name" required minlength="2"></div>
+          <div class="field"><label for="p-email">Email</label><input id="p-email" disabled style="opacity:.5;cursor:not-allowed"></div>
+          <div class="field"><label for="p-phone">Phone</label><input id="p-phone" placeholder="01XXXXXXXXX"></div>
+          <button class="btn" type="submit">💾 Save Profile</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container">📍 LostLink · Web Application Development Final Lab Project</div></footer>
+  <script src="js/common.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

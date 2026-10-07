@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Panel · LostLink</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .admin-hero {
+      background: linear-gradient(135deg, #07091a 0%, #130d30 50%, #07091a 100%);
+      border-bottom: 1px solid var(--line);
+      padding: 36px 0 28px;
+      margin-bottom: 32px;
+    }
+    .admin-hero h1 { color: #fff; font-size: 1.9rem; }
+    .admin-hero p  { color: var(--text-sub); margin-top: 4px; }
+    .section-label {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      font-weight: 700;
+      margin: 28px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+    .charts-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 680px) { .charts-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="navbar" id="navbar"></header>
+
+  <div class="admin-hero">
+    <div class="container">
+      <h1>⚙️ Admin Panel</h1>
+      <p>Manage claims, users, and view platform statistics.</p>
+    </div>
+  </div>
+
+  <main style="padding-top:0">
+    <div class="container">
+      <div id="msg" class="alert hidden"></div>
+
+      <div class="section-label">📊 Statistics</div>
+      <div class="stat-grid" id="stat-grid"></div>
+
+      <div class="charts-grid">
+        <div class="card card-pad">
+          <h3 style="margin-bottom:16px;color:var(--text-sub);font-size:.95rem">📦 Items by Category</h3>
+          <div id="chart-category"></div>
+        </div>
+        <div class="card card-pad">
+          <h3 style="margin-bottom:16px;color:var(--text-sub);font-size:.95rem">📌 Items by Status</h3>
+          <div id="chart-status"></div>
+        </div>
+      </div>
+
+      <div class="section-label">
+        🕐 Pending Claims
+        <span id="pending-count" class="badge badge-pending">0</span>
+      </div>
+      <p class="muted small" style="margin-bottom:16px">Compare the claimant's answer with the verification question, then approve or reject.</p>
+      <div id="pending" class="grid" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr))"></div>
+
+      <div class="section-label">✅ Approved — Awaiting Hand-over</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>Collected by</th><th>Approved</th><th></th></tr></thead>
+            <tbody id="handover"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section-label">👥 Users</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Posts</th><th>Joined</th><th>Role</th><th></th></tr></thead>
+            <tbody id="users"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container">📍 LostLink · Web Application Development Final Lab Project</div></footer>
+  <script src="js/common.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

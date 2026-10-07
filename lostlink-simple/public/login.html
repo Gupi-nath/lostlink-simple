@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in · LostLink</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    main { display: flex; align-items: center; justify-content: center; padding: 48px 20px; }
+    .login-wrap { width: 100%; max-width: 440px; }
+    .login-logo { text-align: center; margin-bottom: 28px; }
+    .login-logo h2 { font-size: 1.8rem; font-weight: 900; letter-spacing: -.04em; }
+    .login-logo h2 span { background: linear-gradient(135deg, #6c63ff, #9d52ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .login-logo p { color: var(--text-sub); font-size: .9rem; margin-top: 6px; }
+    .demo-box { background: rgba(108,99,255,.08); border: 1px solid rgba(108,99,255,.2); border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 20px; }
+    .demo-box strong { display: block; color: var(--primary-light); font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+    .demo-row { display: flex; justify-content: space-between; align-items: center; font-size: .84rem; color: var(--text-sub); padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .demo-row:last-child { border-bottom: none; }
+    .demo-row code { background: rgba(255,255,255,.06); padding: 2px 8px; border-radius: 4px; font-size: .8rem; color: var(--text); }
+  </style>
+</head>
+<body>
+  <header class="navbar" id="navbar"></header>
+  <main>
+    <div class="login-wrap">
+      <div class="login-logo">
+        <h2>📍 Lost<span>Link</span></h2>
+        <p>Campus Lost &amp; Found Portal</p>
+      </div>
+
+      <div id="msg" class="alert hidden"></div>
+
+      <div class="card card-pad">
+        <div class="tabs">
+          <button class="tab active" id="tab-login" type="button">Log in</button>
+          <button class="tab" id="tab-register" type="button">Create account</button>
+        </div>
+
+        <form id="login-form">
+          <div class="field">
+            <label for="l-email">Email address</label>
+            <input id="l-email" type="email" required autocomplete="email" placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label for="l-password">Password</label>
+            <input id="l-password" type="password" required autocomplete="current-password" placeholder="••••••••">
+          </div>
+          <button class="btn btn-block" type="submit" style="margin-top:4px">Log in →</button>
+        </form>
+
+        <form id="register-form" class="hidden">
+          <div class="field">
+            <label for="r-name">Full name</label>
+            <input id="r-name" required minlength="2" placeholder="Your full name">
+          </div>
+          <div class="field">
+            <label for="r-email">Email address</label>
+            <input id="r-email" type="email" required autocomplete="email" placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label for="r-phone">Phone <span class="muted">(optional)</span></label>
+            <input id="r-phone" placeholder="01XXXXXXXXX">
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="r-password">Password</label>
+              <input id="r-password" type="password" minlength="6" required autocomplete="new-password" placeholder="Min. 6 characters">
+            </div>
+            <div class="field">
+              <label for="r-confirm">Confirm password</label>
+              <input id="r-confirm" type="password" minlength="6" required autocomplete="new-password" placeholder="Repeat password">
+            </div>
+          </div>
+          <button class="btn btn-block" type="submit">Create account →</button>
+        </form>
+      </div>
+
+      <div class="demo-box">
+        <strong>🔑 Demo Accounts</strong>
+        <div class="demo-row"><span>👨‍💼 Admin</span><code>admin@lostlink.test</code><code>admin123</code></div>
+        <div class="demo-row"><span>🎓 Student</span><code>student@lostlink.test</code><code>student123</code></div>
+      </div>
+    </div>
+  </main>
+  <footer class="footer"><div class="container">📍 LostLink · Web Application Development Final Lab Project</div></footer>
+  <script src="js/common.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
