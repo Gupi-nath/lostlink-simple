@@ -25,7 +25,10 @@ const dbConfig = process.env.DATABASE_URL
       waitForConnections: true,
       connectionLimit: 10,
       charset: 'utf8mb4',
-      ssl: process.env.DB_SSL === 'false' ? undefined : { rejectUnauthorized: false },
+      ssl: {
+        minVersion: 'TLSv1.2',
+        rejectUnauthorized: false,
+      },
     }
   : {
       host:             process.env.DB_HOST     || 'localhost',
@@ -37,11 +40,11 @@ const dbConfig = process.env.DATABASE_URL
       connectionLimit:  10,
       charset:          'utf8mb4',
       ssl: (process.env.DB_SSL === 'true' || (process.env.DB_HOST && process.env.DB_HOST !== 'localhost' && process.env.DB_HOST !== '127.0.0.1'))
-        ? { rejectUnauthorized: false }
+        ? { minVersion: 'TLSv1.2', rejectUnauthorized: false }
         : undefined,
     };
 
-const pool = mysql.createPool(process.env.DATABASE_URL || dbConfig);
+const pool = mysql.createPool(dbConfig);
 
 // Query helpers – mirror the better-sqlite3 API style
 async function q(sql, params = []) {
