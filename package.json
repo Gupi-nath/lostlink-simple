@@ -1,0 +1,19 @@
+{
+  "name": "lostlink-app",
+  "version": "1.0.0",
+  "description": "LostLink Campus Lost & Found portal",
+  "main": "lostlink-simple/server.js",
+  "scripts": {
+    "start": "node lostlink-simple/server.js",
+    "build": "cd lostlink-simple && npm install"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^4.22.3",
+    "express-session": "^1.17.3",
+    "mysql2": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

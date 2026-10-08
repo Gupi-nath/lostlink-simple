@@ -14,11 +14,20 @@ const config = {
 
 async function main() {
   console.log('🔌 Connecting to MySQL...');
-  const conn = await mysql.createConnection(config);
 
-  console.log('📦 Creating database "lostlink"...');
-  await conn.query('CREATE DATABASE IF NOT EXISTS lostlink CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
-  await conn.query('USE lostlink');
+  let conn;
+  if (process.env.DATABASE_URL) {
+    conn = await mysql.createConnection({
+      uri: process.env.DATABASE_URL,
+      multipleStatements: true,
+      ssl: process.env.DB_SSL === 'false' ? undefined : { rejectUnauthorized: false },
+    });
+  } else {
+    conn = await mysql.createConnection(config);
+    console.log('📦 Creating database "lostlink"...');
+    await conn.query('CREATE DATABASE IF NOT EXISTS lostlink CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+    await conn.query('USE lostlink');
+  }
 
   console.log('🏗  Creating tables...');
   await conn.query(`

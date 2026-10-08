@@ -19,16 +19,29 @@ const CATEGORIES = [
 const CATEGORY_NAMES = CATEGORIES.map(c => c.name);
 
 // ------------------------------------------------------------------ DATABASE
-const pool = mysql.createPool({
-  host:             process.env.DB_HOST     || 'localhost',
-  port:             Number(process.env.DB_PORT) || 3306,
-  user:             process.env.DB_USER     || 'root',
-  password:         process.env.DB_PASSWORD || 'ABcd12&&@@',
-  database:         process.env.DB_NAME     || 'lostlink',
-  waitForConnections: true,
-  connectionLimit:  10,
-  charset:          'utf8mb4',
-});
+const dbConfig = process.env.DATABASE_URL
+  ? {
+      uri: process.env.DATABASE_URL,
+      waitForConnections: true,
+      connectionLimit: 10,
+      charset: 'utf8mb4',
+      ssl: process.env.DB_SSL === 'false' ? undefined : { rejectUnauthorized: false },
+    }
+  : {
+      host:             process.env.DB_HOST     || 'localhost',
+      port:             Number(process.env.DB_PORT) || 3306,
+      user:             process.env.DB_USER     || 'root',
+      password:         process.env.DB_PASSWORD || 'ABcd12&&@@',
+      database:         process.env.DB_NAME     || 'lostlink',
+      waitForConnections: true,
+      connectionLimit:  10,
+      charset:          'utf8mb4',
+      ssl: (process.env.DB_SSL === 'true' || (process.env.DB_HOST && process.env.DB_HOST !== 'localhost' && process.env.DB_HOST !== '127.0.0.1'))
+        ? { rejectUnauthorized: false }
+        : undefined,
+    };
+
+const pool = mysql.createPool(process.env.DATABASE_URL || dbConfig);
 
 // Query helpers – mirror the better-sqlite3 API style
 async function q(sql, params = []) {
@@ -50,6 +63,7 @@ async function qCount(sql, params = []) {
 
 // ------------------------------------------------------------------ APP SETUP
 const app = express();
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '50kb' }));
 
 // CORS – allow both localhost and file:// opened pages to reach the API
@@ -442,14 +456,88 @@ app.use((err, _req, res, _next) => {
   fail(res, 500, 'Something went wrong on the server.');
 });
 
+// Auto-initialize tables and seed demo admin if empty
+async function ensureTables() {
+  try {
+    await q(`
+      CREATE TABLE IF NOT EXISTS users (
+        id            INT AUTO_INCREMENT PRIMARY KEY,
+        name          VARCHAR(200) NOT NULL,
+        email         VARCHAR(200) NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL,
+        role          ENUM('student','admin') NOT NULL DEFAULT 'student',
+        phone         VARCHAR(50),
+        created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+    await q(`
+      CREATE TABLE IF NOT EXISTS items (
+        id               INT AUTO_INCREMENT PRIMARY KEY,
+        user_id          INT NOT NULL,
+        type             ENUM('lost','found') NOT NULL,
+        title            VARCHAR(300) NOT NULL,
+        description      TEXT,
+        category         VARCHAR(100) NOT NULL,
+        location         VARCHAR(300) NOT NULL,
+        event_date       DATE NOT NULL,
+        verify_question  VARCHAR(500),
+        status           ENUM('open','claimed','returned') NOT NULL DEFAULT 'open',
+        created_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+    await q(`
+      CREATE TABLE IF NOT EXISTS claims (
+        id           INT AUTO_INCREMENT PRIMARY KEY,
+        item_id      INT NOT NULL,
+        claimant_id  INT NOT NULL,
+        answer       VARCHAR(500) NOT NULL,
+        status       ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+        note         TEXT,
+        created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        reviewed_at  DATETIME,
+        FOREIGN KEY (item_id)     REFERENCES items(id) ON DELETE CASCADE,
+        FOREIGN KEY (claimant_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    const count = await qCount('SELECT COUNT(*) AS c FROM users');
+    if (count === 0) {
+      console.log('🌱 Seeding initial demo users and items...');
+      const adminHash = await bcrypt.hash('admin123', 10);
+      const studentHash = await bcrypt.hash('student123', 10);
+      const r1 = await qRun(
+        'INSERT INTO users (name, email, password_hash, role, phone) VALUES (?,?,?,?,?)',
+        ['Campus Admin', 'admin@lostlink.test', adminHash, 'admin', '01700000000']
+      );
+      const r2 = await qRun(
+        'INSERT INTO users (name, email, password_hash, role, phone) VALUES (?,?,?,?,?)',
+        ['Demo Student', 'student@lostlink.test', studentHash, 'student', '01700000001']
+      );
+      const today = new Date().toISOString().slice(0, 10);
+      await qRun(
+        'INSERT INTO items (user_id, type, title, description, category, location, event_date, verify_question) VALUES (?,?,?,?,?,?,?,?)',
+        [r2.lastInsertRowid, 'found', 'Black earbuds case', 'Found on a bench near the library entrance.', 'Electronics', 'Central Library', today, 'What brand is printed on the case?']
+      );
+      console.log('✅ Demo data ready.');
+    }
+  } catch (err) {
+    console.warn('ℹ️  Table initialization notice:', err.message);
+  }
+}
+
 // ------------------------------------------------------------------ START
 if (require.main === module) {
   pool.getConnection()
-    .then(conn => { conn.release(); console.log('✅ MySQL connected.'); })
+    .then(async conn => {
+      conn.release();
+      console.log('✅ MySQL connected.');
+      await ensureTables();
+    })
     .then(() => app.listen(PORT, () => console.log(`🚀 LostLink running → http://localhost:${PORT}`)))
     .catch(err => {
       console.error('❌ MySQL connection failed:', err.message);
-      console.error('   1. Make sure MySQL is running in Workbench.');
+      console.error('   1. Make sure MySQL is running in Workbench or Cloud MySQL URL is correct.');
       console.error('   2. Run:  node db_setup.js  (first time only)');
       process.exit(1);
     });
